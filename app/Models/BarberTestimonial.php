@@ -9,6 +9,6 @@ class BarberTestimonial extends Model
 {
     use HasFactory;
     protected $table = 'barbertestimonials';
-
+    public $hidden = ['barber_id'];
     public  $timestamps = false;
 }

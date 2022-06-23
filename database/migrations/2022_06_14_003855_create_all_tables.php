@@ -30,9 +30,8 @@ class CreateAllTables extends Migration
         Schema::create('barbers', function (Blueprint $table) {
             $table->id();
             $table->string('name');
-            $table->string('email')->unique();
             $table->string('avatar')->default('default.png');
-            $table->float('star')->default(0);
+            $table->float('stars')->default(0);
             $table->string('latitude')->nullable();
             $table->string('longitude')->nullable();
         });

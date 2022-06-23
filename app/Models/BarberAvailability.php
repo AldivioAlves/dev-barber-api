@@ -8,8 +8,7 @@ use Illuminate\Database\Eloquent\Model;
 class BarberAvailability extends Model
 {
     use HasFactory;
-    use HasFactory;
     protected $table = 'barberavailability';
-
+    public $hidden=['barber_id'];
     public  $timestamps = false;
 }

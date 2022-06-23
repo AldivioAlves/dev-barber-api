@@ -26,10 +26,14 @@ Route::post('user/favorite',[UserController::class,'addFavorite']);
 Route::get('user/appointments',[UserController::class,'getAppointments']);
 
 
-Route::get('barber',[BarberController::class,'index']);
-Route::get('barber/id',[BarberController::class,'show']);
-Route::post('barber/{id}/appointment',[BarberController::class,'setAppointment']);
+Route::get('barbers',[BarberController::class,'index']);
+Route::get('barbers/{id}',[BarberController::class,'show']);
+Route::post('barbers/{id}/appointment',[BarberController::class,'setAppointment']);
 
 Route::get('search',[BarberController::class,'search']);
+
+Route::get('unauthozired',[AuthController::class,'unauthorized'])->name('login');
+
+Route::get('random',[BarberController::class,'createRandom']);
 
 
