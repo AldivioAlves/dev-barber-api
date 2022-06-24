@@ -9,7 +9,7 @@ class UserFavorite extends Model
 {
     use HasFactory;
 
-    protected $table = 'userfavorites';
-
+    protected $table = 'usersfavorites';
+    public $hidden = 'barber_id';
     public  $timestamps = false;
 }

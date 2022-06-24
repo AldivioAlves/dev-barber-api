@@ -8,6 +8,7 @@ use App\Models\BarberPhotos;
 use App\Models\BarberServices;
 use App\Models\BarberTestimonial;
 use App\Models\UserAppointment;
+use App\Models\UserFavorite;
 use Illuminate\Database\Eloquent\ModelNotFoundException;
 use Illuminate\Http\Request;
 
@@ -23,6 +24,7 @@ class BarberController extends Controller
 
     public function show($id)
     {
+
         $barber = Barber::with([
             'photos',
             'testimonials',
@@ -34,26 +36,58 @@ class BarberController extends Controller
                     date('Y-m-d', strtotime('+20 days')) . ' 23:59:59'
                 ]);
             }
-        ])
-            ->find($id);
-
+        ])->find($id);
         if (!$barber) {
             return $this->sendErrorResponse('Barbeiro não localizado', 404);
         }
+        $favorited = false;
+        $favoritedByUser = UserFavorite::where('barber_id', $barber->id)
+            ->where('user_id', $this->loggedUser->id)->first();
+
+        if ($favoritedByUser) {
+            $favorited = true;
+        }
+        $barber['favorited'] =$favorited;
+
         $barber->avatar = url('media/avatars/' . $barber->avatar);
         foreach ($barber->photos as $photo) {
             $photo->url = url('media/uploads/' . $photo->url);
         }
+        $availability = [];
         $availWeekdays = [];
         foreach ($barber->availabilities as $avaliabity) {
             $availWeekdays[$avaliabity->weekday] = explode(',', $avaliabity->hours);
         }
-
         $appointments = [];
 
         foreach ($barber->appointments as $appointment) {
             $appointments[] = $appointment->ap_datetime;
         }
+
+        for ($q = 0; $q < 20; $q++) {
+            $timeItem = strtotime('+' . $q . ' days');
+            $weekday = date('w', $timeItem);
+            if (in_array($weekday, array_keys($availWeekdays))) {
+                $hours = [];
+                $dayItem = date('Y-m-d', $timeItem);
+
+                foreach ($availWeekdays[$weekday] as $hourItem) {
+                    $dayFormated = $dayItem . ' ' . $hourItem . ':00';
+                    if (!in_array($dayFormated, $appointments)) {
+                        $hours[] = $hourItem;
+                    }
+                }
+                if (count($hours) > 0) {
+                    $availability[] = [
+                        'date' => $dayItem,
+                        'hours' => $hours
+                    ];
+                }
+            }
+        }
+
+        $barber['available'] = $availability;
+
         return $barber;
     }
 
